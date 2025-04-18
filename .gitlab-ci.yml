@@ -1,0 +1,29 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+
+stages:
+  - setup
+  - lint
+
+image: python:3.12-alpine
+
+poetry:
+  stage: setup
+  tags:
+    - students
+  variables:
+    POETRY_VIRTUALENVS_PATH: $CI_PROJECT_DIR/.venv
+    POETRY_NO_INTERACTION: "true"
+  script:
+    - apt-get update && apt-get install -y --no-install-recommends curl
+    - curl -sSL https://install.python-poetry.org | python3 -
+    - export PATH="$POETRY_HOME/bin:$PATH"
+    - poetry install --only dev
+
+pre-commit:
+  stage: lint
+  tags:
+    - students
+  script:
+    - poetry run pre-commit run --all-files
