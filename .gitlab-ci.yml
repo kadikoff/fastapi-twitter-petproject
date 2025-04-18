@@ -6,17 +6,19 @@ stages:
   - setup
   - lint
 
-image: python:3.12-slim
+variables:
+  POETRY_HOME: $CI_PROJECT_DIR/poetry
+  PATH: $POETRY_HOME/bin:$PATH
+  POETRY_VIRTUALENVS_PATH: $CI_PROJECT_DIR/.venv
+  POETRY_NO_INTERACTION: "true"
 
 poetry:
   stage: setup
   tags:
     - students
-  variables:
-    POETRY_HOME: $CI_PROJECT_DIR/poetry
-    PATH: $POETRY_HOME/bin:$PATH
-    POETRY_VIRTUALENVS_PATH: $CI_PROJECT_DIR/.venv
-    POETRY_NO_INTERACTION: "true"
+  image:
+    name: python:3.12-slim
+    entrypoint: [""]
   script:
     - apt-get update && apt-get install -y --no-install-recommends curl
     - curl -sSL https://install.python-poetry.org | python3 -
