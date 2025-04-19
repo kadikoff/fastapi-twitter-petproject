@@ -31,8 +31,7 @@ pre-commit:
   stage: lint
   tags:
     - students
-  needs:
-    - job: poetry
-      artifacts: true
+  before_script:
+    - export PATH="$CI_PROJECT_DIR/poetry/bin:$PATH"
   script:
     - poetry run pre-commit run --all-files
