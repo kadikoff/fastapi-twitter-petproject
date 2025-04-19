@@ -35,4 +35,5 @@ pre-commit:
   before_script:
     - export PATH="$CI_PROJECT_DIR/poetry/bin:$PATH"
   script:
+    - apk add --no-cache git
     - poetry run pre-commit run --all-files
