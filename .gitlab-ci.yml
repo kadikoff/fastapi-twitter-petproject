@@ -14,7 +14,6 @@ poetry:
     - students
   variables:
     POETRY_HOME: $CI_PROJECT_DIR/poetry
-    POETRY_VIRTUALENVS_PATH: $CI_PROJECT_DIR/.venv
     POETRY_NO_INTERACTION: "true"
   script:
     - apt-get update && apt-get install -y --no-install-recommends curl
