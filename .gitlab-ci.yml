@@ -33,7 +33,7 @@ pre-commit:
   tags:
     - students
   before_script:
+    - apt-get update && apt-get install -y --no-install-recommends git
     - export PATH="$CI_PROJECT_DIR/poetry/bin:$PATH"
   script:
-    - apk add --no-cache git
     - poetry run pre-commit run --all-files
