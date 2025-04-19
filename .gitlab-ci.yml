@@ -21,6 +21,11 @@ poetry:
     - curl -sSL https://install.python-poetry.org | POETRY_HOME=$CI_PROJECT_DIR/poetry python3 -
     - export PATH="$POETRY_HOME/bin:$PATH"
     - poetry install --only dev --no-root
+  artifacts:
+    expire_in: 1h
+    paths:
+      - $CI_PROJECT_DIR/.venv
+      - $CI_PROJECT_DIR/poetry
 
 pre-commit:
   stage: lint
