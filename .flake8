@@ -4,4 +4,4 @@
 
 [flake8]
 max-line-length = 79
-exclude = ./venv
+exclude = .venv
