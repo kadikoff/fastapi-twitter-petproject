@@ -16,6 +16,7 @@ repos:
         pass_filenames: false
 
       - id: flake8
+        args: [--exclude=venv]
         name: flake8
         entry: flake8 .
         language: system
