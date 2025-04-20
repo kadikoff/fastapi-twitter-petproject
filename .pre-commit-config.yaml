@@ -1,4 +1,4 @@
-exclude: .venv
+exclude: ^\.venv/
 
 repos:
   - repo: local
