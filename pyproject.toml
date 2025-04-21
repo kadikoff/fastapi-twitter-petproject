@@ -16,19 +16,12 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.prod.dependencies]
 fastapi = "^0.115.12"
+pydantic-settings = "^2.9.1"
+uvicorn = "^0.34.2"
 
 
 [tool.poetry.group.dev.dependencies]
 fastapi = "^0.115.12"
-black = "^25.1.0"
 pre-commit = "^4.2.0"
-isort = "^6.0.1"
-mypy = "^1.15.0"
-wemake-python-styleguide = "^1.1.0"
-
-[tool.isort]
-profile = "black"
-line_length = 79
-
-[tool.black]
-line-length = 79
+pydantic-settings = "^2.9.1"
+uvicorn = "^0.34.2"
