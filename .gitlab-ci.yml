@@ -35,4 +35,4 @@ pre-commit:
     - apt-get update && apt-get install -y --no-install-recommends git
     - export PATH="$CI_PROJECT_DIR/poetry/bin:$PATH"
   script:
-    - poetry run pre-commit run --all-files
+    - poetry run pre-commit run --all-files --show-diff
