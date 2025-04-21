@@ -7,7 +7,7 @@ PORT: int = 8000
 
 @app.get("/api/hello/")
 def hello_index():
-    return {"message": "Hello World!!"}
+    return {"message": "Hello World!"}
 
 
 if __name__ == "__main__":
