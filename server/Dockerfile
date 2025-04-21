@@ -2,6 +2,7 @@ FROM python:3.12.10-slim
 
 WORKDIR /project
 
+COPY ../.env   ./
 COPY ../pyproject.toml   ./
 COPY ../poetry.lock      ./
 
