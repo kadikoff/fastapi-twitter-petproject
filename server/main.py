@@ -10,6 +10,25 @@ def hello_index():
     return {"message": "Hello World!"}
 
 
+# @app.get("/api/users/me")
+# def get_my_profile():
+#     return {
+#         "result": True,
+#         "user": {
+#             "id": 1,
+#             "name": "John Doe",
+#             "followers": [
+#                 {"id": 2, "name": "Alice"},
+#                 {"id": 3, "name": "Bob"}
+#             ],
+#             "following": [
+#                 {"id": 4, "name": "Charlie"},
+#                 {"id": 5, "name": "Dave"}
+#             ]
+#         }
+#     }
+
+
 if __name__ == "__main__":
 
     uvicorn.run(
