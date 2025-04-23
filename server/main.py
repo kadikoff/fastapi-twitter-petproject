@@ -1,32 +1,31 @@
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI
 
-app = FastAPI()
+from server.api.routers import router
+from server.core.models import Base, db_helper
+
 PORT: int = 8000
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    async with db_helper.engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+app.include_router(router=router)
 
 
 @app.get("/api/hello/")
 def hello_index():
     return {"message": "Hello World!"}
-
-
-# @app.get("/api/users/me")
-# def get_my_profile():
-#     return {
-#         "result": True,
-#         "user": {
-#             "id": 1,
-#             "name": "John Doe",
-#             "followers": [
-#                 {"id": 2, "name": "Alice"},
-#                 {"id": 3, "name": "Bob"}
-#             ],
-#             "following": [
-#                 {"id": 4, "name": "Charlie"},
-#                 {"id": 5, "name": "Dave"}
-#             ]
-#         }
-#     }
 
 
 if __name__ == "__main__":
