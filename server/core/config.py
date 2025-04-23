@@ -10,6 +10,7 @@ class DbSettings(BaseSettings):
     db_user: str
     db_pass: str
     db_host: str
+    db_host_local: str
     db_port: int
     db_name: str
     db_echo: bool = True
@@ -19,6 +20,14 @@ class DbSettings(BaseSettings):
         return (
             f"postgresql+asyncpg"
             f"://{self.db_user}:{self.db_pass}@{self.db_host}"
+            f":{self.db_port}/{self.db_name}"
+        )
+
+    @property
+    def url_local(self):
+        return (
+            f"postgresql+asyncpg"
+            f"://{self.db_user}:{self.db_pass}@{self.db_host_local}"
             f":{self.db_port}/{self.db_name}"
         )
 
