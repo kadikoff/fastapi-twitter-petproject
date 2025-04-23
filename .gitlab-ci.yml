@@ -6,7 +6,7 @@ stages:
   - setup
   - lint
 
-image: python:3.12-slim
+image: python:3.12.8-slim
 
 poetry:
   stage: setup

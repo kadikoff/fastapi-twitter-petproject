@@ -1,7 +1,8 @@
-FROM python:3.12.10-slim
+FROM python:3.12.8-slim
 
 WORKDIR /project
 
+COPY ../.env   ./
 COPY ../pyproject.toml   ./
 COPY ../poetry.lock      ./
 
@@ -14,6 +15,6 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --only prod --no-root
 
 COPY server/ ./server
-WORKDIR /project/server
+WORKDIR /project
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "8000"]

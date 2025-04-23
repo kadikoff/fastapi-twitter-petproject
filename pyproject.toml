@@ -18,6 +18,8 @@ build-backend = "poetry.core.masonry.api"
 fastapi = "^0.115.12"
 pydantic-settings = "^2.9.1"
 uvicorn = "^0.34.2"
+sqlalchemy = {version = "2.0.20", extras = ["asyncio"]}
+asyncpg = "^0.30.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -25,3 +27,11 @@ fastapi = "^0.115.12"
 pre-commit = "^4.2.0"
 pydantic-settings = "^2.9.1"
 uvicorn = "^0.34.2"
+sqlalchemy = {version = "2.0.20", extras = ["asyncio"]}
+asyncpg = "^0.30.0"
+
+[tool.isort]
+known_first_party = ["core", "api", "server"]
+
+[tool.black]
+line-length = 79
