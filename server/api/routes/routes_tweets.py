@@ -3,8 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import server.api.crud.crud_likes
-from server.api.crud import crud_tweets
+from server.api.crud import crud_likes, crud_tweets
 from server.api.dependencies import authenticate_user
 from server.core.models import Users, db_helper
 from server.core.schemas.schemas_base import BaseResponse, NotFoundResponse
@@ -47,7 +46,9 @@ async def get_tweets(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     response.headers["api-key"] = current_user.api_key
-    tweets = await crud_tweets.get_tweets(session=session)
+    tweets = await crud_tweets.get_tweets(
+        session=session, current_user=current_user
+    )
 
     return {"tweets": tweets}
 
@@ -83,7 +84,7 @@ async def create_like(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     response.headers["api-key"] = current_user.api_key
-    await server.api.crud.crud_likes.create_like(
+    await crud_likes.create_like(
         session=session, tweet_id=tweet_id, current_user=current_user
     )
 
@@ -102,7 +103,7 @@ async def delete_like(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     response.headers["api-key"] = current_user.api_key
-    await server.api.crud.crud_likes.delete_like(
+    await crud_likes.delete_like(
         session=session, tweet_id=tweet_id, current_user=current_user
     )
 
