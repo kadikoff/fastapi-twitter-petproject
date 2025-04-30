@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import HTTPException, status
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,6 +8,7 @@ from sqlalchemy.orm import joinedload
 from server.api.crud import crud_medias
 from server.core.models import Likes, Tweets, Users
 from server.core.schemas.schemas_tweets import TweetCreate
+from server.utils.media_writer import delete_media
 
 
 async def create_tweet(
@@ -57,7 +60,15 @@ async def delete_tweet(
     session: AsyncSession, tweet_id: int, current_user: Users
 ) -> None:
 
-    tweet: Tweets | None = await session.get(Tweets, tweet_id)
+    stmt = (
+        select(Tweets)
+        .where(Tweets.tweet_id == tweet_id)
+        .options(joinedload(Tweets.medias))
+    )
+
+    db_response = await session.execute(stmt)
+    tweet = db_response.unique().scalar_one_or_none()
+
     if not tweet:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -70,6 +81,10 @@ async def delete_tweet(
             detail=f"You don't have permission "
             f"to delete the tweet '{tweet_id}'!",
         )
+
+    if tweet.medias:
+        for media in tweet.medias:
+            await delete_media(file_path=Path(media.media_path))
 
     await session.delete(tweet)
     await session.commit()
