@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String, Table, Column, ForeignKey
+from sqlalchemy import String, Table, Column, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .model_base import Base
@@ -14,7 +14,8 @@ followers_association_table = Table(
     "followers_association",
     Base.metadata,
     Column("follower_id", ForeignKey("users.id"), primary_key=True),
-    Column("followed_id", ForeignKey("users.id"), primary_key=True),
+    Column("following_id", ForeignKey("users.id"), primary_key=True),
+    UniqueConstraint("follower_id", "following_id", name="unique_user_followers"),
 )
 
 
@@ -33,16 +34,16 @@ class Users(Base):
     followers: Mapped[list["Users"]] = relationship(
         "Users",
         secondary=followers_association_table,
-        primaryjoin=(followers_association_table.c.followed_id == id),
+        primaryjoin=(followers_association_table.c.following_id == id),
         secondaryjoin=(followers_association_table.c.follower_id == id),
-        back_populates="followed",
+        back_populates="following",
     )
-    followed: Mapped[list["Users"]] = relationship(
+    following: Mapped[list["Users"]] = relationship(
         "Users",
         secondary=followers_association_table,
         primaryjoin=(followers_association_table.c.follower_id == id),
-        secondaryjoin=(followers_association_table.c.followed_id == id),
-        back_populates="follower",
+        secondaryjoin=(followers_association_table.c.following_id == id),
+        back_populates="followers",
         lazy="selectin",
     )
 
