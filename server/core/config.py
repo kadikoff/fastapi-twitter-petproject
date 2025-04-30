@@ -3,7 +3,8 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-BASE_DIR = Path(__file__).parent.parent.parent
+BASE_PROJECT_DIR = Path(__file__).parent.parent.parent
+BASE_MEDIAS_DIR = BASE_PROJECT_DIR / "server/medias"
 
 
 class DbSettings(BaseSettings):
@@ -32,7 +33,8 @@ class DbSettings(BaseSettings):
         )
 
     model_config = SettingsConfigDict(
-        env_file=os.path.join(BASE_DIR, ".env"), env_file_encoding="utf-8"
+        env_file=os.path.join(BASE_PROJECT_DIR, ".env"),
+        env_file_encoding="utf-8",
     )
 
 
