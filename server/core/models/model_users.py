@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String, Table, Column, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, ForeignKey, String, Table, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .model_base import Base
@@ -15,7 +15,9 @@ followers_association_table = Table(
     Base.metadata,
     Column("follower_id", ForeignKey("users.id"), primary_key=True),
     Column("following_id", ForeignKey("users.id"), primary_key=True),
-    UniqueConstraint("follower_id", "following_id", name="unique_user_followers"),
+    UniqueConstraint(
+        "follower_id", "following_id", name="unique_user_followers"
+    ),
 )
 
 
