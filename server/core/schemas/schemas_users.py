@@ -6,6 +6,11 @@ class BaseUser(BaseModel):
     name: str
 
 
+class BaseUserFollowers(BaseUser):
+    followers: list[BaseUser]
+    following: list[BaseUser]
+
+
 class UserRead(BaseModel):
     result: bool = True
-    user: BaseUser
+    user: BaseUserFollowers
