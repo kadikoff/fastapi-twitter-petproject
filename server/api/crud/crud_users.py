@@ -1,18 +1,26 @@
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
-from server.core.models import Users
+from server.core.models import Users, followers_association_table
 
 
 async def get_user_by_api_key(
     session: AsyncSession, api_key: str
 ) -> Users | None:
 
-    stmt = select(Users).where(Users.api_key == api_key)
+    stmt = (
+        select(Users)
+        .where(Users.api_key == api_key)
+        .options(
+            joinedload(Users.followers),
+            joinedload(Users.following),
+        )
+    )
     db_response = await session.execute(stmt)
 
-    user = db_response.scalar_one_or_none()
+    user = db_response.unique().scalar_one_or_none()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -24,7 +32,17 @@ async def get_user_by_api_key(
 
 async def get_user_by_id(session: AsyncSession, user_id: int) -> Users | None:
 
-    user: Users | None = await session.get(Users, user_id)
+    stmt = (
+        select(Users)
+        .where(Users.id == user_id)
+        .options(
+            joinedload(Users.followers),
+            joinedload(Users.following),
+        )
+    )
+    db_response = await session.execute(stmt)
+
+    user = db_response.unique().scalar_one_or_none()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -32,3 +50,26 @@ async def get_user_by_id(session: AsyncSession, user_id: int) -> Users | None:
         )
 
     return user
+
+
+async def create_follow(
+    session: AsyncSession, current_user: Users, user_id: int
+) -> None:
+
+    stmt = insert(followers_association_table).values(
+        follower_id=current_user.id, following_id=user_id
+    )
+    await session.execute(stmt)
+    await session.commit()
+
+
+async def delete_follow(
+    session: AsyncSession, current_user: Users, user_id: int
+) -> None:
+
+    stmt = delete(followers_association_table).where(
+        followers_association_table.c.follower_id == current_user.id,
+        followers_association_table.c.following_id == user_id,
+    )
+    await session.execute(stmt)
+    await session.commit()
