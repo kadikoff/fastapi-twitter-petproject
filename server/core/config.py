@@ -3,8 +3,10 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-BASE_PROJECT_DIR = Path(__file__).parent.parent.parent
-BASE_MEDIAS_DIR = BASE_PROJECT_DIR / "server/medias"
+BASE_PROJECT_DIR = Path(__file__).parent.parent.parent  # /project
+BASE_MEDIAS_DIR = BASE_PROJECT_DIR / "server/medias"  # /project/server/medias
+
+MEDIAS_ALLOWED_EXT = {".jpg", ".jpeg", ".png"}
 
 
 class DbSettings(BaseSettings):
