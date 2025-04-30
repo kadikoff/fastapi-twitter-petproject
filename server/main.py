@@ -25,8 +25,7 @@ async def create_mock_data() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
 
-    BASE_MEDIAS_DIR.mkdir(parents=True, exist_ok=True)
-
+    BASE_MEDIAS_DIR.mkdir(mode=0o755, parents=True, exist_ok=True)
     # await create_mock_data()
 
     yield
