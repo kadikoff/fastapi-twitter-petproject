@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -27,12 +27,24 @@ async def create_tweet(
     return new_tweet
 
 
-async def get_tweets(session: AsyncSession) -> list[Tweets] | None:
+async def get_tweets(
+    session: AsyncSession, current_user: Users
+) -> list[Tweets] | None:
 
-    stmt = select(Tweets).options(
-        joinedload(Tweets.user),
-        joinedload(Tweets.likes).subqueryload(Likes.user),
-        joinedload(Tweets.medias),
+    following_ids: list[int] = [user.id for user in current_user.following]
+    following_ids.append(current_user.id)
+
+    stmt = (
+        select(Tweets, func.count(Tweets.likes).label("count_likes"))
+        .filter(Tweets.user_id.in_(following_ids))
+        .options(
+            joinedload(Tweets.user),
+            joinedload(Tweets.likes).subqueryload(Likes.user),
+            joinedload(Tweets.medias),
+        )
+        .outerjoin(Tweets.likes)
+        .group_by(Tweets)
+        .order_by(desc("count_likes"))
     )
 
     db_response = await session.execute(stmt)
