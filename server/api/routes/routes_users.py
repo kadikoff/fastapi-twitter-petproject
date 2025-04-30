@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from server.api.crud import crud_users
 from server.api.dependencies import authenticate_user
 from server.core.models import Users, db_helper
-from server.core.schemas.schemas_base import NotFoundResponse
+from server.core.schemas.schemas_base import BaseResponse, NotFoundResponse
 from server.core.schemas.schemas_users import UserRead
 
 router = APIRouter()
@@ -37,3 +37,43 @@ async def get_user(
 ):
     user = await crud_users.get_user_by_id(user_id=user_id, session=session)
     return {"user": user}
+
+
+@router.post(
+    "/api/users/{user_id}/follow",
+    status_code=status.HTTP_200_OK,
+    response_model=BaseResponse,
+    responses={404: {"model": NotFoundResponse}},
+)
+async def create_follow(
+    current_user: Annotated[Users, Depends(authenticate_user)],
+    user_id: Annotated[int, Path(ge=1)],
+    response: Response,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    response.headers["api-key"] = current_user.api_key
+    await crud_users.create_follow(
+        session=session, current_user=current_user, user_id=user_id
+    )
+
+    return {"result": True}
+
+
+@router.delete(
+    "/api/users/{user_id}/follow",
+    status_code=status.HTTP_200_OK,
+    response_model=BaseResponse,
+    responses={404: {"model": NotFoundResponse}},
+)
+async def delete_follow(
+    current_user: Annotated[Users, Depends(authenticate_user)],
+    user_id: Annotated[int, Path(ge=1)],
+    response: Response,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    response.headers["api-key"] = current_user.api_key
+    await crud_users.delete_follow(
+        session=session, current_user=current_user, user_id=user_id
+    )
+
+    return {"result": True}
