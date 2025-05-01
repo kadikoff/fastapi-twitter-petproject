@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from fastapi import UploadFile
 
-_TEST_MEDIA_DIR = Path(__file__).parent / "utils_tests/medias"
+_TEST_MEDIA_DIR = Path(__file__).parent.parent / "tests_utils/medias"
 
 
 @pytest.fixture
