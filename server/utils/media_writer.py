@@ -8,6 +8,10 @@ from fastapi import HTTPException, UploadFile, status
 from server.core.config import BASE_MEDIAS_DIR, MEDIAS_ALLOWED_EXT
 
 
+async def create_medias_directory(path: Path):
+    path.mkdir(mode=0o755, parents=True, exist_ok=True)
+
+
 async def validate_media(file_name: str) -> None:
     file_ext = Path(file_name).suffix.lower()
     if file_ext not in MEDIAS_ALLOWED_EXT:
@@ -26,13 +30,13 @@ async def generate_media_file_name(file_name: str) -> str:
     return f"{timestamp}_{random_num}{file_ext}"
 
 
-async def save_media(file: UploadFile):
+async def save_media(file: UploadFile, path_to_save: Path = BASE_MEDIAS_DIR):
     await validate_media(file_name=file.filename)
     new_file_name: str = await generate_media_file_name(
         file_name=file.filename
     )
 
-    file_path = BASE_MEDIAS_DIR / new_file_name
+    file_path = path_to_save / new_file_name
 
     try:
         file_bytes = await file.read()
