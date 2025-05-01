@@ -36,6 +36,8 @@ alembic = "^1.15.2"
 python-multipart = "^0.0.20"
 aiofiles = "^24.1.0"
 mypy = "1.13.0"
+pytest = "^8.3.5"
+pytest-asyncio = "^0.26.0"
 
 [tool.isort]
 profile = "black"
@@ -43,3 +45,12 @@ known_first_party = ["core", "api", "server"]
 
 [tool.black]
 line-length = 79
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "ignore::pydantic.PydanticDeprecatedSince20",
+    "ignore::pytest.PytestDeprecationWarning",
+#    'ignore::configuration option "asyncio_default_fixture_loop_scope" is unset'
+]
