@@ -56,6 +56,13 @@ async def create_follow(
     session: AsyncSession, current_user: Users, user_id: int
 ) -> None:
 
+    following_user = await session.get(Users, user_id)
+    if not following_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User '{user_id}' not found!",
+        )
+
     stmt = insert(followers_association_table).values(
         follower_id=current_user.id, following_id=user_id
     )
