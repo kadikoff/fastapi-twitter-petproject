@@ -1,4 +1,9 @@
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+)
 
 from server.core.models import Medias
 
@@ -26,7 +31,7 @@ class TweetsRead(BaseModel):
 
 
 class TweetCreate(BaseModel):
-    tweet_data: str
+    tweet_data: str = Field(min_length=1, max_length=100)
     tweet_media_ids: list[int] | None
 
 
