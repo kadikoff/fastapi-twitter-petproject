@@ -1,8 +1,10 @@
 import pytest
 from fastapi import HTTPException
+from sqlalchemy import Result, select
 
 from server.api.crud import crud_users
 from server.core.models import Users
+from server.core.models import followers_association_table as fat
 from tests.data.data_db_mock import users_correct
 
 
@@ -16,7 +18,7 @@ async def test_get_user_by_api_key_success(db_session):
         session=db_session, api_key=user_data["api_key"]
     )
 
-    assert user
+    assert user is not None
     assert isinstance(user, Users)
     assert user.name == user_data["name"]
     assert user.api_key == user_data["api_key"]
@@ -49,7 +51,7 @@ async def test_get_user_by_id_success(db_session):
         session=db_session, user_id=user_data["id"]
     )
 
-    assert user
+    assert user is not None
     assert isinstance(user, Users)
     assert user.name == user_data["name"]
     assert user.api_key == user_data["api_key"]
@@ -79,11 +81,21 @@ async def test_create_follow_success(db_session):
     """
 
     user_data_1 = Users(**users_correct[0])
+    user_id_1: int = user_data_1.id
     user_data_2: dict = users_correct[1]
+    user_id_2: int = user_data_2["id"]
 
     await crud_users.create_follow(
-        session=db_session, current_user=user_data_1, user_id=user_data_2["id"]
+        session=db_session, current_user=user_data_1, user_id=user_id_2
     )
+
+    stmt = select(fat).where(
+        fat.c.follower_id == user_id_1, fat.c.following_id == user_id_2
+    )
+    db_response: Result = await db_session.execute(stmt)
+    followers: fat | None = db_response.scalar_one_or_none()
+
+    assert followers is not None
 
 
 @pytest.mark.asyncio
@@ -93,15 +105,23 @@ async def test_create_follow_error(db_session):
     """
 
     user_data = Users(**users_correct[0])
-    fake_user_id = 123456789
+    user_id_1: int = user_data.id
+    fake_user_id_2 = 123456789
 
     with pytest.raises(HTTPException) as exc_info:
         await crud_users.create_follow(
-            session=db_session, current_user=user_data, user_id=fake_user_id
+            session=db_session, current_user=user_data, user_id=fake_user_id_2
         )
 
+    stmt = select(fat).where(
+        fat.c.follower_id == user_id_1, fat.c.following_id == fake_user_id_2
+    )
+    db_response: Result = await db_session.execute(stmt)
+    followers: fat | None = db_response.scalar_one_or_none()
+
+    assert followers is None
     assert exc_info.value.status_code == 404
-    assert exc_info.value.detail == f"User '{fake_user_id}' not found!"
+    assert exc_info.value.detail == f"User '{fake_user_id_2}' not found!"
 
 
 @pytest.mark.asyncio
@@ -111,8 +131,18 @@ async def test_delete_follow_success(db_session):
     """
 
     user_data_1 = Users(**users_correct[0])
+    user_id_1: int = user_data_1.id
     user_data_2: dict = users_correct[1]
+    user_id_2: int = user_data_2["id"]
 
     await crud_users.delete_follow(
-        session=db_session, current_user=user_data_1, user_id=user_data_2["id"]
+        session=db_session, current_user=user_data_1, user_id=user_id_2
     )
+
+    stmt = select(fat).where(
+        fat.c.follower_id == user_id_1, fat.c.following_id == user_id_2
+    )
+    db_response: Result = await db_session.execute(stmt)
+    followers: fat | None = db_response.scalar_one_or_none()
+
+    assert followers is None
