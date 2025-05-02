@@ -1,5 +1,4 @@
 import pytest
-
 from sqlalchemy import inspect
 
 from server.core.models import Base
@@ -16,5 +15,7 @@ async def test_tables_created():
 
     expected_tables = Base.metadata.tables.keys()
 
-    missing_tables = [table for table in expected_tables if table not in table_names]
+    missing_tables = [
+        table for table in expected_tables if table not in table_names
+    ]
     assert not missing_tables, f"Tables not created: {missing_tables}"
