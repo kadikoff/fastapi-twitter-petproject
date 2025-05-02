@@ -1,21 +1,22 @@
 from io import BytesIO
-from pathlib import Path
 
 import pytest
 from fastapi import UploadFile
+from sqlalchemy import insert
 
 from server.core.models import (
     Base,
     DatabaseHelper,
-    Likes,
     Medias,
     Tweets,
     Users,
 )
-
-_BASE_TESTS_DIR = Path(__file__).parent
-_MEDIAS_DIR = _BASE_TESTS_DIR / "data/medias"
-_MEDIA_PATH = str(_BASE_TESTS_DIR / "data/medias/cat.jpeg")
+from tests.data.data_db_mock import (
+    MEDIAS_DIR,
+    medias_correct,
+    tweets_correct,
+    users_correct,
+)
 
 _db_helper = DatabaseHelper(
     url="sqlite+aiosqlite:///./tests/data/test.db", echo=True
@@ -51,54 +52,22 @@ async def global_db_session(create_db):
         await session.close()
 
 
-@pytest.fixture(scope="session")
-async def users_objs():
-    return [
-        Users(id=1, name="Nick Ivanov", api_key="test"),
-        Users(id=2, name="Ivan Petrov", api_key="dev"),
-    ]
-
-
-@pytest.fixture(scope="session")
-async def tweets_obj():
-    return Tweets(tweet_id=1, tweet_data="Hello world!", user_id=1)
-
-
-@pytest.fixture(scope="session")
-async def medias_obj():
-    return Medias(media_id=1, media_path=_MEDIA_PATH, tweet_id=1)
-
-
-@pytest.fixture(scope="session")
-async def likes_obj():
-    return Likes(like_id=1, tweet_id=1, user_id=1)
-
-
 @pytest.fixture(scope="session", autouse=True)
-async def create_mock_data(
-    global_db_session, users_objs, tweets_obj, medias_obj, likes_obj
-):
-    global_db_session.add_all(users_objs)
-    await global_db_session.commit()
-
-    global_db_session.add_all(
-        (
-            tweets_obj,
-            medias_obj,
-            likes_obj,
-        )
-    )
+async def create_mock_data(global_db_session):
+    await global_db_session.execute(insert(Users), users_correct)
+    await global_db_session.execute(insert(Tweets), tweets_correct)
+    await global_db_session.execute(insert(Medias), medias_correct)
     await global_db_session.commit()
 
 
 @pytest.fixture(scope="session", autouse=True)
 async def create_test_medias_dir():
-    _MEDIAS_DIR.mkdir(mode=0o755, parents=True, exist_ok=True)
+    MEDIAS_DIR.mkdir(mode=0o755, parents=True, exist_ok=True)
 
 
 @pytest.fixture
 async def path_to_medias_dir():
-    return _MEDIAS_DIR
+    return MEDIAS_DIR
 
 
 @pytest.fixture
