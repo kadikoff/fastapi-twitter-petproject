@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 
@@ -15,6 +16,19 @@ def register_errors_handlers(app: FastAPI):
                 "result": False,
                 "error_type": exc.status_code,
                 "error_message": exc.detail,
+            },
+        )
+
+    @app.exception_handler(ValidationError)
+    async def custom_error_handler_validation(
+        request: Request, exc: ValidationError
+    ) -> JSONResponse:
+        return JSONResponse(
+            status_code=422,
+            content={
+                "result": False,
+                "error_type": 422,
+                "error_message": exc.errors(),
             },
         )
 
