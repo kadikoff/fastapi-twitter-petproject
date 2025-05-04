@@ -1,7 +1,8 @@
 from pathlib import Path
+from typing import Sequence
 
 from fastapi import HTTPException, status
-from sqlalchemy import desc, func, select
+from sqlalchemy import Result, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -32,7 +33,7 @@ async def create_tweet(
 
 async def get_tweets(
     session: AsyncSession, current_user: Users
-) -> list[Tweets] | None:
+) -> list[Tweets | None]:
 
     following_ids: list[int] = [user.id for user in current_user.following]
     following_ids.append(current_user.id)
@@ -50,8 +51,8 @@ async def get_tweets(
         .order_by(desc("count_likes"))
     )
 
-    db_response = await session.execute(stmt)
-    tweets = db_response.unique().scalars().all()
+    db_response: Result = await session.execute(stmt)
+    tweets: Sequence[Tweets] = db_response.unique().scalars().all()
 
     return list(tweets)
 
@@ -66,8 +67,8 @@ async def delete_tweet(
         .options(joinedload(Tweets.medias))
     )
 
-    db_response = await session.execute(stmt)
-    tweet = db_response.unique().scalar_one_or_none()
+    db_response: Result = await session.execute(stmt)
+    tweet: Tweets | None = db_response.unique().scalar_one_or_none()
 
     if not tweet:
         raise HTTPException(
@@ -84,7 +85,8 @@ async def delete_tweet(
 
     if tweet.medias:
         for media in tweet.medias:
-            await delete_media(file_path=Path(media.media_path))
+            media_path = Path(media.media_path)
+            await delete_media(file_path=media_path)
 
     await session.delete(tweet)
     await session.commit()

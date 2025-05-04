@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import UploadFile
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,9 +8,10 @@ from server.core.models import Medias, Tweets
 from server.utils.media_writer import save_media
 
 
-async def create_media(session: AsyncSession, file: UploadFile):
+async def create_media(session: AsyncSession, file: UploadFile) -> Medias:
+    """Создание записи в таблице Medias"""
 
-    file_path = await save_media(file=file)
+    file_path: Path | None = await save_media(file=file)
     new_media = Medias(media_path=str(file_path))
     session.add(new_media)
     await session.commit()
@@ -18,7 +21,10 @@ async def create_media(session: AsyncSession, file: UploadFile):
 
 async def update_media(
     session: AsyncSession, tweet: Tweets, tweet_media_ids: list[int]
-):
+) -> None:
+    """Обновление записи в таблице Medias:
+    добавление tweet_id (id твитов) к медиа
+    """
 
     stmt = (
         update(Medias)

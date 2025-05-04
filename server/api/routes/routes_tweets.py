@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.api.crud import crud_likes, crud_tweets
 from server.api.dependencies import authenticate_user
-from server.core.models import Users, db_helper
+from server.core.models import Tweets, Users, db_helper
 from server.core.schemas.schemas_base import BaseResponse, NotFoundResponse
 from server.core.schemas.schemas_tweets import (
     TweetCreate,
@@ -46,7 +46,7 @@ async def get_tweets(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     response.headers["api-key"] = current_user.api_key
-    tweets = await crud_tweets.get_tweets(
+    tweets: list[Tweets | None] = await crud_tweets.get_tweets(
         session=session, current_user=current_user
     )
 

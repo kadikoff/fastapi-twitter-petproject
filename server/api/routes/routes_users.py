@@ -35,7 +35,9 @@ async def get_user(
     user_id: Annotated[int, Path(ge=1)],
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    user = await crud_users.get_user_by_id(user_id=user_id, session=session)
+    user: Users | None = await crud_users.get_user_by_id(
+        user_id=user_id, session=session
+    )
     return {"user": user}
 
 

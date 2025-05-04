@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from sqlalchemy import delete, insert, select
+from sqlalchemy import Result, delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -18,9 +18,9 @@ async def get_user_by_api_key(
             joinedload(Users.following),
         )
     )
-    db_response = await session.execute(stmt)
+    db_response: Result = await session.execute(stmt)
 
-    user = db_response.unique().scalar_one_or_none()
+    user: Users | None = db_response.unique().scalar_one_or_none()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -40,9 +40,9 @@ async def get_user_by_id(session: AsyncSession, user_id: int) -> Users | None:
             joinedload(Users.following),
         )
     )
-    db_response = await session.execute(stmt)
+    db_response: Result = await session.execute(stmt)
 
-    user = db_response.unique().scalar_one_or_none()
+    user: Users | None = db_response.unique().scalar_one_or_none()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -56,7 +56,7 @@ async def create_follow(
     session: AsyncSession, current_user: Users, user_id: int
 ) -> None:
 
-    following_user = await session.get(Users, user_id)
+    following_user: Users | None = await session.get(Users, user_id)
     if not following_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
