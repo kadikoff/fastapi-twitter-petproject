@@ -5,10 +5,8 @@ import uvicorn
 from fastapi import FastAPI
 
 from server.api.routes import router
-from server.core.config import BASE_MEDIAS_DIR
 from server.core.models import Users, db_helper
 from server.error_handlers import register_errors_handlers
-from server.utils.media_writer import create_medias_directory
 
 PORT: int = 8000
 
@@ -26,12 +24,11 @@ async def create_mock_data() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
 
-    await create_medias_directory(path=BASE_MEDIAS_DIR)
-    # await create_mock_data()
+    await create_mock_data()
 
     yield
 
-    # await db_helper.engine.dispose()
+    await db_helper.engine.dispose()
 
 
 app = FastAPI(lifespan=lifespan)
