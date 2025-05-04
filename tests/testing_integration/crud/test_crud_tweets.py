@@ -75,7 +75,7 @@ async def test_get_tweets_success(db_session):
 
     user_data = Users(**users_correct[0])
 
-    new_tweet: list[Tweets] | None = await crud_tweets.get_tweets(
+    new_tweet: list[Tweets | None] = await crud_tweets.get_tweets(
         session=db_session, current_user=user_data
     )
 
@@ -93,6 +93,10 @@ async def test_delete_tweet_success(db_session):
     await crud_tweets.delete_tweet(
         session=db_session, tweet_id=tweet_id, current_user=user_data
     )
+
+    tweet: Tweets | None = await db_session.get(Tweets, tweet_id)
+
+    assert tweet is None
 
 
 @pytest.mark.asyncio
