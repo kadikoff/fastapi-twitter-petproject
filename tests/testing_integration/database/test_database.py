@@ -7,6 +7,9 @@ from tests.conftest import _db_helper
 
 @pytest.mark.asyncio
 async def test_tables_created():
+    """Тест успешного создания базы данных и таблиц
+    для проведения тестов
+    """
 
     async with _db_helper.engine.connect() as conn:
         table_names = await conn.run_sync(

@@ -13,7 +13,7 @@ from server.utils.media_writer import delete_media
 async def test_create_media_success(db_session, sample_media_jpg):
     """Тест успешного создания медиа"""
 
-    new_media: Medias | None = await crud_medias.create_media(
+    new_media: Medias = await crud_medias.create_media(
         session=db_session, file=sample_media_jpg
     )
     media_path = Path(new_media.media_path)
