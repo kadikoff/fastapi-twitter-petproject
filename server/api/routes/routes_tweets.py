@@ -40,6 +40,15 @@ async def create_tweet(
     response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
+    """Создать твит
+
+    1. Проверка авторизации текущего пользователя
+    2. Валидация данных создаваемого твита
+    3. Получение сессии для базы данных
+    4. Запись api_key текущего пользователя в заголовок ответа
+    5. Добавление данных в таблицу бд
+    """
+
     response.headers["api-key"] = current_user.api_key
 
     return await crud_tweets.create_tweet(
@@ -63,6 +72,14 @@ async def get_tweets(
     response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
+    """Получить информации о всех твитах
+
+    1. Проверка авторизации текущего пользователя
+    2. Получение сессии для базы данных
+    3. Запись api_key текущего пользователя в заголовок ответа
+    4. Запрос данных из бд
+    """
+
     response.headers["api-key"] = current_user.api_key
     tweets: list[Tweets | None] = await crud_tweets.get_tweets(
         session=session, current_user=current_user
@@ -90,6 +107,15 @@ async def delete_tweet(
     response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
+    """Удалить твит
+
+    1. Проверка авторизации текущего пользователя
+    2. Валидация tweet_id запрашиваемого твита
+    3. Получение сессии для базы данных
+    4. Запись api_key текущего пользователя в заголовок ответа
+    5. Удаление данных из таблицы бд
+    """
+
     response.headers["api-key"] = current_user.api_key
     await crud_tweets.delete_tweet(
         session=session, tweet_id=tweet_id, current_user=current_user
@@ -116,6 +142,15 @@ async def create_like(
     response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
+    """Создать лайк на твит
+
+    1. Проверка авторизации текущего пользователя
+    2. Валидация tweet_id запрашиваемого твита
+    3. Получение сессии для базы данных
+    4. Запись api_key текущего пользователя в заголовок ответа
+    5. Добавление данных в таблицу бд
+    """
+
     response.headers["api-key"] = current_user.api_key
     await crud_likes.create_like(
         session=session, tweet_id=tweet_id, current_user=current_user
@@ -141,6 +176,15 @@ async def delete_like(
     response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
+    """Удалить лайк с твита
+
+    1. Проверка авторизации текущего пользователя
+    2. Валидация tweet_id запрашиваемого твита
+    3. Получение сессии для базы данных
+    4. Запись api_key текущего пользователя в заголовок ответа
+    5. Удаление данных из таблицы бд
+    """
+
     response.headers["api-key"] = current_user.api_key
     await crud_likes.delete_like(
         session=session, tweet_id=tweet_id, current_user=current_user

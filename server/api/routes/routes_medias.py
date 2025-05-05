@@ -35,6 +35,14 @@ async def upload_medias(
     response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
+    """Загрузить медиа-файлы
+
+    1. Проверка авторизации текущего пользователя
+    2. Получение сессии для базы данных
+    3. Запись api_key текущего пользователя в заголовок ответа
+    4. Добавление данных в таблицу бд
+    """
+
     response.headers["api-key"] = current_user.api_key
 
     new_media: Medias = await crud_medias.create_media(
