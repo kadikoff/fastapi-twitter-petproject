@@ -1,3 +1,13 @@
+user_data_invalid = {
+    "result": "true",
+    "user": {
+        "id": [],
+        "name": "Aleksey Owner",
+        "followers": {"id": 2, "name": "Nikita Ivanov"},
+        "following": {"id": 3, "name": "Ivan Volkov"},
+    },
+}
+
 tweet_no_media_valid = {
     "tweet_data": "Tweet without media!",
     "tweet_media_ids": [],
