@@ -28,6 +28,11 @@ _db_helper = DatabaseHelper(
 
 @pytest.fixture(scope="session")
 async def create_db():
+    """Создание таблиц в тестовой базе данных
+
+    Применяется при запросе только один раз
+    за всю сессию тестов.
+    """
     async with _db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
@@ -35,6 +40,11 @@ async def create_db():
 
 @pytest.fixture
 async def db_session(create_db):
+    """Создание асинхронной сессии
+
+    Применяется неограниченно при запросах
+    из функций.
+    """
     async with _db_helper.session_factory() as session:
         yield session
         await session.close()
@@ -49,6 +59,9 @@ async def global_db_session(create_db):
     create_mock_data), т.к. возникает ошибка ScopeMismatch из-за несоответствия
     областей видимости при вызове фикстуры db_session со scope="function"
     из фикстуры create_mock_data со scope="session" и autouse=True
+
+    Применяется при запросе только один раз
+    за всю сессию тестов.
     """
     async with _db_helper.session_factory() as session:
         yield session
@@ -57,7 +70,11 @@ async def global_db_session(create_db):
 
 @pytest.fixture
 async def client(db_session):
-    """Создание тестового клиента и переопределение сессии"""
+    """Создание тестового клиента и переопределение сессии
+
+    Применяется неограниченно при запросах
+    из функций.
+    """
 
     async def override_get_db():
         yield db_session
@@ -74,6 +91,11 @@ async def client(db_session):
 
 @pytest.fixture(scope="session", autouse=True)
 async def create_mock_data(global_db_session):
+    """Добавление тестовых данных в таблицы базы данных
+
+    Применяется автоматически только один раз
+    за всю сессию тестов при их запуске.
+    """
     await global_db_session.execute(insert(Users), users_correct)
     await global_db_session.execute(insert(Tweets), tweets_correct)
     await global_db_session.execute(insert(Medias), medias_correct)
@@ -82,16 +104,36 @@ async def create_mock_data(global_db_session):
 
 @pytest.fixture(scope="session", autouse=True)
 async def create_test_medias_dir():
+    """Создание временной тестовой директории для
+    хранения тестовых медиа файлов
+
+    Применяется автоматически только один раз
+    за всю сессию тестов при их запуске.
+    """
     MEDIAS_DIR.mkdir(mode=0o755, parents=True, exist_ok=True)
 
 
 @pytest.fixture
 async def path_to_medias_dir():
+    """Возвращает директорию для хранения
+    временных тестовых медиа-файлов
+
+    Применяется неограниченно при запросах
+    из функций.
+    """
+
     return MEDIAS_DIR
 
 
 @pytest.fixture
 async def sample_media_jpg():
+    """Создание медиа-файла типа UploadFile
+    с расширением jpg, поддерживаемым проектом.
+
+    Применяется неограниченно при запросах
+    из функций.
+    """
+
     content = b"fake media"
     file_name = "test.jpg"
     return UploadFile(filename=file_name, file=BytesIO(content))
@@ -99,6 +141,13 @@ async def sample_media_jpg():
 
 @pytest.fixture
 async def sample_media_pdf():
+    """Создание медиа-файла типа UploadFile
+    с расширением pdf, неподдерживаемым проектом.
+
+    Применяется неограниченно при запросах
+    из функций.
+    """
+
     content = b"fake media"
     file_name = "test.pdf"
     return UploadFile(filename=file_name, file=BytesIO(content))
