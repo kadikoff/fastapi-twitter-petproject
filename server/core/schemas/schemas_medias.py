@@ -1,16 +1,20 @@
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, Field
 
 
 class MediasRead(BaseModel):
-    result: bool = True
-    media_id: int
+    """Схема для ответа API при загрузке медиа-файлов
 
+    Используется в эндпоинтах:
+    - POST /api/medias - загрузка медиа-файлов
+    """
 
-class MediasAllRead(BaseModel):
-    media_path: list[str]
-
-    model_config = ConfigDict(serialize_by_alias=True)
-
-    @field_validator("media_path", mode="before")
-    def get_fields(cls, data):
-        return [data.media_path]
+    result: bool = Field(
+        description="Результат успешного ответа",
+        default=True,
+        examples=[True],
+    )
+    media_id: int = Field(
+        description="Уникальный идентификатор медиа-файла в системе",
+        ge=1,
+        examples=[1],
+    )

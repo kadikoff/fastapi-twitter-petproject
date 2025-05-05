@@ -2,8 +2,17 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class BaseLikes(BaseModel):
-    id: int = Field(serialization_alias="user_id")
-    name: str
+    """Вложенная схема с информацией о лайках"""
+
+    id: int = Field(
+        description="Уникальный идентификатор пользователя в системе",
+        serialization_alias="user_id",
+        examples=[2],
+    )
+    name: str = Field(
+        description="Имя пользователя",
+        examples=["Nikita Ivanov"],
+    )
 
     model_config = ConfigDict(serialize_by_alias=True)
 
