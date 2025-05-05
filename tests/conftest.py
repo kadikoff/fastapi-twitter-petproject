@@ -2,6 +2,7 @@ from io import BytesIO
 
 import pytest
 from fastapi import UploadFile
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy import insert
 
 from server.core.models import (
@@ -10,7 +11,9 @@ from server.core.models import (
     Medias,
     Tweets,
     Users,
+    db_helper,
 )
+from server.main import app
 from tests.data.data_db_mock import (
     MEDIAS_DIR,
     medias_correct,
@@ -50,6 +53,23 @@ async def global_db_session(create_db):
     async with _db_helper.session_factory() as session:
         yield session
         await session.close()
+
+
+@pytest.fixture
+async def client(db_session):
+    """Создание тестового клиента и переопределение сессии"""
+
+    async def override_get_db():
+        yield db_session
+
+    app.dependency_overrides[db_helper.session_dependency] = override_get_db
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        yield client
+
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture(scope="session", autouse=True)
