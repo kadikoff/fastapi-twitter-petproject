@@ -7,6 +7,7 @@ from server.api.crud import crud_medias
 from server.api.dependencies import authenticate_user
 from server.core.models import Medias, Users, db_helper
 from server.core.schemas.schemas_base import (
+    BadRequestErrorResponse,
     NotFoundErrorResponse,
     ServerErrorResponse,
     UnauthorizedErrorResponse,
@@ -23,6 +24,7 @@ router = APIRouter()
     response_model=MediasRead,
     summary="Загрузить медиа-файлы",
     responses={
+        400: {"model": BadRequestErrorResponse},
         401: {"model": UnauthorizedErrorResponse},
         404: {"model": NotFoundErrorResponse},
         422: {"model": ValidationErrorResponse},
