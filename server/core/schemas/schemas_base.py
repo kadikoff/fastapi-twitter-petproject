@@ -34,6 +34,24 @@ class BaseErrorResponse(BaseModel):
     )
 
 
+class BadRequestErrorResponse(BaseErrorResponse):
+    """Схема для ответа API, когда сервер не может обработать
+    запрос из-за ошибок на стороне клиента
+
+    Используется в эндпоинте:
+    - POST /api/medias - загрузить медиа-файлы
+    """
+
+    error_type: int = Field(
+        description="Статус код ошибки",
+        default=status.HTTP_400_BAD_REQUEST,
+    )
+    error_message: str = Field(
+        description="Сообщение об ошибке",
+        default="Invalid file format! Acceptable: ...",
+    )
+
+
 class UnauthorizedErrorResponse(BaseErrorResponse):
     """Схема для ответа API при неуспешном запросе api_key
 
@@ -66,7 +84,7 @@ class NotFoundErrorResponse(BaseErrorResponse):
         - DELETE /api/tweets/{tweet_id} - удалить твит
         - POST /api/tweets/{tweet_id}/likes - создать лайк на твит
     - /api/medias
-        - /api/medias - загрузить медиа-файлы
+        - POST /api/medias - загрузить медиа-файлы
     """
 
     error_type: int = Field(
