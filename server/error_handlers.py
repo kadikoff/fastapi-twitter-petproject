@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import ValidationError
 
 
 def register_errors_handlers(app: FastAPI):
@@ -18,9 +18,9 @@ def register_errors_handlers(app: FastAPI):
             },
         )
 
-    @app.exception_handler(ValidationError)
+    @app.exception_handler(RequestValidationError)
     async def custom_error_handler_validation(
-        request: Request, exc: ValidationError
+        request: Request, exc: RequestValidationError
     ) -> JSONResponse:
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
