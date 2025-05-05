@@ -22,11 +22,11 @@ class BaseUserFollowers(BaseUser):
 
     followers: list[BaseUser] = Field(
         description="Список пользователей, которые подписаны на текущего",
-        examples=[{"id": 2, "name": "Nikita Ivanov"}],
+        examples=[[{"id": 2, "name": "Nikita Ivanov"}]],
     )
     following: list[BaseUser] = Field(
         description="Список пользователей, на которых подписан текущий",
-        examples=[{"id": 3, "name": "Ivan Volkov"}],
+        examples=[[{"id": 3, "name": "Ivan Volkov"}]],
     )
 
 

@@ -27,7 +27,7 @@ class BaseTweet(BaseModel):
     medias: list[str] = Field(
         description="Информация о медиа-файлах (путь до медиа-файла)",
         serialization_alias="attachments",
-        examples=["/home/usr/bin/cat.jpg"],
+        examples=[["/home/usr/bin/cat.jpg"]],
     )
     user: BaseUser = Field(
         description="Информация о пользователе-авторе твита",
