@@ -1,7 +1,6 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-from sqlalchemy.exc import SQLAlchemyError
 
 
 def register_errors_handlers(app: FastAPI):
@@ -24,23 +23,23 @@ def register_errors_handlers(app: FastAPI):
         request: Request, exc: ValidationError
     ) -> JSONResponse:
         return JSONResponse(
-            status_code=422,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "result": False,
-                "error_type": 422,
+                "error_type": status.HTTP_422_UNPROCESSABLE_ENTITY,
                 "error_message": exc.errors(),
             },
         )
 
-    @app.exception_handler(SQLAlchemyError)
+    @app.exception_handler(Exception)
     async def custom_error_handler_sqlalchemy(
-        request: Request, exc: SQLAlchemyError
+        request: Request, exc: Exception
     ) -> JSONResponse:
         return JSONResponse(
-            status_code=520,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
                 "result": False,
-                "error_type": 520,
-                "error_message": exc.__str__(),
+                "error_type": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "error_message": f"Server error: {str(exc)}",
             },
         )
