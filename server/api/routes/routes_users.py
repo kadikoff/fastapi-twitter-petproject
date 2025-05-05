@@ -15,6 +15,7 @@ router = APIRouter()
 @router.get(
     "/api/users/me",
     status_code=status.HTTP_200_OK,
+    summary="Получить информацию о себе",
     response_model=UserRead,
 )
 async def get_me(
@@ -29,6 +30,7 @@ async def get_me(
     "/api/users/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=UserRead,
+    summary="Получить информацию о пользователе по его id",
     responses={404: {"model": NotFoundResponse}},
 )
 async def get_user(
@@ -45,6 +47,7 @@ async def get_user(
     "/api/users/{user_id}/follow",
     status_code=status.HTTP_200_OK,
     response_model=BaseResponse,
+    summary="Создать подписку на другого пользователя",
     responses={404: {"model": NotFoundResponse}},
 )
 async def create_follow(
@@ -65,6 +68,7 @@ async def create_follow(
     "/api/users/{user_id}/follow",
     status_code=status.HTTP_200_OK,
     response_model=BaseResponse,
+    summary="Удалить подписку на другого пользователя",
     responses={404: {"model": NotFoundResponse}},
 )
 async def delete_follow(

@@ -16,6 +16,7 @@ router = APIRouter()
     "/api/medias",
     status_code=status.HTTP_201_CREATED,
     response_model=MediasRead,
+    summary="Загрузка медиа-файлов",
     responses={404: {"model": NotFoundResponse}},
 )
 async def upload_medias(

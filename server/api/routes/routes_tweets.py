@@ -20,6 +20,7 @@ router = APIRouter()
     "/api/tweets",
     status_code=status.HTTP_201_CREATED,
     response_model=TweetRead,
+    summary="Создать твит",
     responses={404: {"model": NotFoundResponse}},
 )
 async def create_tweet(
@@ -38,6 +39,7 @@ async def create_tweet(
     "/api/tweets",
     status_code=status.HTTP_200_OK,
     response_model=TweetsRead,
+    summary="Получить информации о всех твитах",
     responses={404: {"model": NotFoundResponse}},
 )
 async def get_tweets(
@@ -56,6 +58,7 @@ async def get_tweets(
 @router.delete(
     "/api/tweets/{tweet_id}",
     status_code=status.HTTP_200_OK,
+    summary="Удалить твит",
     response_model=BaseResponse,
 )
 async def delete_tweet(
@@ -75,6 +78,7 @@ async def delete_tweet(
 @router.post(
     "/api/tweets/{tweet_id}/likes",
     status_code=status.HTTP_201_CREATED,
+    summary="Создать лайк на твит",
     response_model=BaseResponse,
 )
 async def create_like(
@@ -94,6 +98,7 @@ async def create_like(
 @router.delete(
     "/api/tweets/{tweet_id}/likes",
     status_code=status.HTTP_200_OK,
+    summary="Удалить лайк с твита",
     response_model=BaseResponse,
 )
 async def delete_like(
