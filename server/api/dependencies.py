@@ -12,6 +12,10 @@ async def authenticate_user(
     session: AsyncSession = Depends(db_helper.session_dependency),
     api_key: str = Security(API_KEY_HEADER),
 ) -> Users | None:
+    """Зависимость для проверки существования пользователя
+    по переданному api_key в заголовке для использования
+    в FastAPI Depends
+    """
 
     return await crud_users.get_user_by_api_key(
         session=session, api_key=api_key

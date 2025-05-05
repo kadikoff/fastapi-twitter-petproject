@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 
 def register_errors_handlers(app: FastAPI):
+    """Регистрирует в приложении FastAPI обработчики исключений"""
 
     @app.exception_handler(HTTPException)
     async def custom_error_handler_http(
