@@ -9,6 +9,21 @@ from server.core.models import Users, followers_association_table
 async def get_user_by_api_key(
     session: AsyncSession, api_key: str
 ) -> Users | None:
+    """Получение данных пользователя по его api_key
+    из таблицы Users
+
+    Вместе с получением данных о пользователе, из
+    интеграционной таблицы followers_association_table
+    подгружаются данные о подписчиках и подписках.
+
+    Если пользователь не авторизован - возникает ошибка.
+
+    Используется в зависимости по аутентификации пользователя,
+    там проверяется - существует ли пользователь в системе
+    с текущим api_key или нет.
+
+    Далее данные о текущем пользователе используются и в других методах.
+    """
 
     stmt = (
         select(Users)
@@ -31,6 +46,13 @@ async def get_user_by_api_key(
 
 
 async def get_user_by_id(session: AsyncSession, user_id: int) -> Users | None:
+    """Получение данных о пользователе по его user_id из таблицы Users
+
+    Если пользователь по текущему id не найден - возникает ошибка.
+
+    Используется в эндпоинте:
+    - GET /api/users/{user_id} - получить информацию о пользователе по его id
+    """
 
     stmt = (
         select(Users)
@@ -55,6 +77,16 @@ async def get_user_by_id(session: AsyncSession, user_id: int) -> Users | None:
 async def create_follow(
     session: AsyncSession, current_user: Users, user_id: int
 ) -> None:
+    """Создание подписки текущего пользователя на другого
+    в таблице followers_association_table
+
+    Если второго пользователя не существует в системе -
+    возникает ошибка.
+
+    Используется в эндпоинте:
+    - POST /api/users/{user_id}/follow -
+    создать подписку на другого пользователя
+    """
 
     following_user: Users | None = await session.get(Users, user_id)
     if not following_user:
@@ -73,6 +105,13 @@ async def create_follow(
 async def delete_follow(
     session: AsyncSession, current_user: Users, user_id: int
 ) -> None:
+    """Удаление подписки текущего пользователя на другого
+    из таблицы followers_association_table
+
+    Используется в эндпоинте:
+    - DELETE /api/users/{user_id}/follow -
+    удалить подписку на другого пользователя
+    """
 
     stmt = delete(followers_association_table).where(
         followers_association_table.c.follower_id == current_user.id,

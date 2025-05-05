@@ -9,7 +9,16 @@ from server.utils.media_writer import save_media
 
 
 async def create_media(session: AsyncSession, file: UploadFile) -> Medias:
-    """Создание записи в таблице Medias"""
+    """Создание записи в таблице Medias - сохранение пути до медиа-файла
+
+    Используется в момент, когда пользователь выкладывает твит
+    с медиа-файлом - создаётся запись в таблице с указанием
+    пути до медиа-файла (media_path) на сервере, чтобы в дальнейшем
+    при get-запросах подгрузить те самые медиа-файлы, зная их путь.
+
+    Используется в эндпоинте:
+    - POST /api/medias - загрузить медиа-файлы
+    """
 
     file_path: Path | None = await save_media(file=file)
     new_media = Medias(media_path=str(file_path))
@@ -22,8 +31,10 @@ async def create_media(session: AsyncSession, file: UploadFile) -> Medias:
 async def update_media(
     session: AsyncSession, tweet: Tweets, tweet_media_ids: list[int]
 ) -> None:
-    """Обновление записи в таблице Medias:
-    добавление tweet_id (id твитов) к медиа
+    """Обновление записи в таблице Medias - привязка медиа-файлов
+    к твитам через колонку tweet_id в таблице Medias
+
+    Используется в crud-методе по созданию твита - create_tweet
     """
 
     stmt = (

@@ -8,6 +8,11 @@ from server.core.models import Likes, Tweets, Users
 async def create_like(
     session: AsyncSession, tweet_id: int, current_user: Users
 ) -> None:
+    """Добавляет лайк к твиту от текущего пользователя в таблице Likes
+
+    Используется в эндпоинте:
+    - POST /api/tweets/{tweet_id}/likes - создать лайк на твит
+    """
 
     tweet: Tweets | None = await session.get(Tweets, tweet_id)
     if not tweet:
@@ -25,6 +30,11 @@ async def create_like(
 async def delete_like(
     session: AsyncSession, tweet_id: int, current_user: Users
 ) -> None:
+    """Удаляет лайк с твита от текущего пользователя в таблице Likes
+
+    Используется в эндпоинте:
+    - DELETE /api/tweets/{tweet_id}/likes - удалить лайк с твита
+    """
 
     stmt = select(Likes).where(
         Likes.tweet_id == tweet_id, Likes.user_id == current_user.id
