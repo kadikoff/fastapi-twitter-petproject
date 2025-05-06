@@ -6,9 +6,7 @@ from sqlalchemy.orm import joinedload
 from server.core.models import Users, followers_association_table
 
 
-async def get_user_by_api_key(
-    session: AsyncSession, api_key: str
-) -> Users | None:
+async def get_user_by_api_key(session: AsyncSession, api_key: str) -> Users:
     """Получение данных пользователя по его api_key
     из таблицы Users
 
