@@ -1,12 +1,12 @@
 import logging
-import os
 from pathlib import Path
 from typing import ClassVar, Type
 
+from dotenv import load_dotenv
 from fastapi.openapi.models import Response
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
 # Путь до корневой папки проекта
 BASE_PROJECT_DIR = Path(__file__).parent.parent.parent  # /project
@@ -30,6 +30,8 @@ API_DOCS_DESCRIPTION = (
     "В целях тестирования для авторизации используется "
     "один из двух доступных api_key: test или dev"
 )
+
+load_dotenv()
 
 
 class FastApiConfig(BaseModel):
@@ -89,10 +91,10 @@ class DbSettings(BaseSettings):
             f":{self.db_port}/{self.db_name}"
         )
 
-    model_config = SettingsConfigDict(
-        env_file=os.path.join(BASE_PROJECT_DIR, ".env"),
-        env_file_encoding="utf-8",
-    )
+    # model_config = SettingsConfigDict(
+    #     env_file=os.path.join(BASE_PROJECT_DIR, ".env"),
+    #     env_file_encoding="utf-8",
+    # )
 
 
 class Settings(BaseSettings):
