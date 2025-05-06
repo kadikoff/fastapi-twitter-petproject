@@ -91,11 +91,6 @@ class DbSettings(BaseSettings):
             f":{self.db_port}/{self.db_name}"
         )
 
-    # model_config = SettingsConfigDict(
-    #     env_file=os.path.join(BASE_PROJECT_DIR, ".env"),
-    #     env_file_encoding="utf-8",
-    # )
-
 
 class Settings(BaseSettings):
     """Корневая конфигурация приложения"""
