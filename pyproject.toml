@@ -42,6 +42,7 @@ pytest-asyncio = "^0.26.0"
 aiosqlite = "^0.21.0"
 httpx = "^0.28.1"
 orjson = "^3.10.18"
+pytest-cov = "^6.1.1"
 
 [tool.isort]
 profile = "black"
