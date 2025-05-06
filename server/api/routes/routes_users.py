@@ -1,10 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Response, status
+from fastapi import APIRouter, Depends, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.api.crud import crud_users
-from server.api.dependencies import authenticate_user
+from server.core.dependencies.authenticate import authenticate_user
 from server.core.models import Users, db_helper
 from server.core.schemas.schemas_base import (
     BaseResponse,
@@ -31,7 +31,6 @@ router = APIRouter()
 )
 async def get_me(
     current_user: Annotated[Users, Depends(authenticate_user)],
-    response: Response,
 ):
     """Получить информацию о себе (о текущем пользователе)
 
@@ -39,8 +38,6 @@ async def get_me(
     1.1. Запрос данных из бд
     2. Запись api_key текущего пользователя в заголовок ответа
     """
-
-    response.headers["api-key"] = current_user.api_key
 
     return {"user": current_user}
 
@@ -89,7 +86,6 @@ async def get_user(
 async def create_follow(
     current_user: Annotated[Users, Depends(authenticate_user)],
     user_id: Annotated[int, Path(ge=1)],
-    response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """Создать подписку на другого пользователя
@@ -101,7 +97,6 @@ async def create_follow(
     5. Добавление данных в таблицу бд
     """
 
-    response.headers["api-key"] = current_user.api_key
     await crud_users.create_follow(
         session=session, current_user=current_user, user_id=user_id
     )
@@ -124,7 +119,6 @@ async def create_follow(
 async def delete_follow(
     current_user: Annotated[Users, Depends(authenticate_user)],
     user_id: Annotated[int, Path(ge=1)],
-    response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """Удалить подписку на другого пользователя
@@ -136,7 +130,6 @@ async def delete_follow(
     5. Удаление данных из таблицы бд
     """
 
-    response.headers["api-key"] = current_user.api_key
     await crud_users.delete_follow(
         session=session, current_user=current_user, user_id=user_id
     )

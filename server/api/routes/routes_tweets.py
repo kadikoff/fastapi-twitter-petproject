@@ -1,10 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Response, status
+from fastapi import APIRouter, Depends, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.api.crud import crud_likes, crud_tweets
-from server.api.dependencies import authenticate_user
+from server.core.dependencies.authenticate import authenticate_user
 from server.core.models import Tweets, Users, db_helper
 from server.core.schemas.schemas_base import (
     BaseResponse,
@@ -37,7 +37,6 @@ router = APIRouter()
 async def create_tweet(
     current_user: Annotated[Users, Depends(authenticate_user)],
     tweet_in: TweetCreate,
-    response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """Создать твит
@@ -48,8 +47,6 @@ async def create_tweet(
     4. Запись api_key текущего пользователя в заголовок ответа
     5. Добавление данных в таблицу бд
     """
-
-    response.headers["api-key"] = current_user.api_key
 
     return await crud_tweets.create_tweet(
         session=session, user=current_user, tweet_in=tweet_in
@@ -69,7 +66,6 @@ async def create_tweet(
 )
 async def get_tweets(
     current_user: Annotated[Users, Depends(authenticate_user)],
-    response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """Получить информации о всех твитах
@@ -80,7 +76,6 @@ async def get_tweets(
     4. Запрос данных из бд
     """
 
-    response.headers["api-key"] = current_user.api_key
     tweets: list[Tweets | None] = await crud_tweets.get_tweets(
         session=session, current_user=current_user
     )
@@ -104,7 +99,6 @@ async def get_tweets(
 async def delete_tweet(
     current_user: Annotated[Users, Depends(authenticate_user)],
     tweet_id: Annotated[int, Path(ge=1)],
-    response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """Удалить твит
@@ -116,7 +110,6 @@ async def delete_tweet(
     5. Удаление данных из таблицы бд
     """
 
-    response.headers["api-key"] = current_user.api_key
     await crud_tweets.delete_tweet(
         session=session, tweet_id=tweet_id, current_user=current_user
     )
@@ -139,7 +132,6 @@ async def delete_tweet(
 async def create_like(
     current_user: Annotated[Users, Depends(authenticate_user)],
     tweet_id: Annotated[int, Path(ge=1)],
-    response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """Создать лайк на твит
@@ -151,7 +143,6 @@ async def create_like(
     5. Добавление данных в таблицу бд
     """
 
-    response.headers["api-key"] = current_user.api_key
     await crud_likes.create_like(
         session=session, tweet_id=tweet_id, current_user=current_user
     )
@@ -173,7 +164,6 @@ async def create_like(
 async def delete_like(
     current_user: Annotated[Users, Depends(authenticate_user)],
     tweet_id: Annotated[int, Path(ge=1)],
-    response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """Удалить лайк с твита
@@ -185,7 +175,6 @@ async def delete_like(
     5. Удаление данных из таблицы бд
     """
 
-    response.headers["api-key"] = current_user.api_key
     await crud_likes.delete_like(
         session=session, tweet_id=tweet_id, current_user=current_user
     )
