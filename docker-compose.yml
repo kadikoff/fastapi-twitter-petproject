@@ -9,6 +9,8 @@ services:
       - server
     ports:
       - "8080:80"
+    volumes:
+      - ./server/medias:/usr/share/nginx/medias
     networks:
       - mynetwork
 
@@ -23,6 +25,8 @@ services:
         restart: true
     ports:
       - '8000:8000'
+    volumes:
+      - ./server/medias:/project/server/medias
     networks:
       - mynetwork
 

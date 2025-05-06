@@ -15,6 +15,10 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --only prod --no-root
 
 COPY server/ ./server
+COPY alembic/ ./alembic
+COPY alembic.ini ./
+
 WORKDIR /project
 
-CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD alembic upgrade head && \
+    uvicorn server.main:app --host 0.0.0.0 --port 8000

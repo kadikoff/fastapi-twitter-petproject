@@ -5,6 +5,7 @@ workflow:
 stages:
   - setup
   - lint
+  - test
 
 image: python:3.12.8-slim
 
@@ -36,3 +37,12 @@ pre-commit:
     - export PATH="$CI_PROJECT_DIR/poetry/bin:$PATH"
   script:
     - poetry run pre-commit run --all-files --show-diff
+
+pytest:
+  stage: test
+  tags:
+    - students
+  before_script:
+    - export PATH="$CI_PROJECT_DIR/poetry/bin:$PATH"
+  script:
+    - poetry run pytest -v ./tests
