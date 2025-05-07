@@ -37,6 +37,7 @@ endpoint имеют `http-header` с названием `api-key`. Вот сюд
 - `fastapi==0.115.12` - Современный веб-фреймворк для создания API с автоматической генерацией документации 
 - `uvicorn==0.34.2` - ASGI-сервер для запуска FastAPI приложения с поддержкой асинхронности
 - `orjson==3.10.18` - Быстрый JSON-сериализатор/десериализатор (альтернатива стандартному json)
+- `bcrypt==4.3.0"` - хэширование api-key
 - `pydantic==2.7.0` - Библиотека для валидации данных и создания моделей с аннотацией типов
 - `pydantic-settings==2.9.1` - Расширение Pydantic для работы с конфигурацией приложения
 - `alembic==1.15.2` - Инструмент для миграций базы данных 
@@ -48,8 +49,10 @@ endpoint имеют `http-header` с названием `api-key`. Вот сюд
 ## Быстрый старт
 
 ### Предварительные требования (наличие на пк)
-- Git
-- Docker и Docker Compose
+- **ОС**: Unix-подобная система (Linux/Ubuntu/macOS)
+- **Git** (система контроля версий)
+- **Docker** и **Docker compose**
+
 
 ### Установка и запуск
 1. Склонируйте репозиторий:
@@ -118,51 +121,134 @@ twitter-clone/
 └── README.md                     # Документация проекта
 ```
 
-### Покрытие кода тестами
-Для вывод отчёта о покрытии приложения тестами испоьзуйте команду:
-```
-pytest --cov=./server
-```
-**Таблица с отчётом о покрытии тестами**
+## Тестирование приложения
+### Предварительные требования (наличие на пк)
+- **ОС**: Unix-подобная система (Linux/Ubuntu/macOS)
+- **Git** (система контроля версий)
+- **Python** версии 3.12 или выше
+- **PyCharm** (рекомендуемая IDE)
+- **Poetry** (менеджер зависимостей)
 
-| Модуль                                       | Строк | Пропущено | Покрытие |
-|----------------------------------------------|-------|-----------|----------|
-| `server/__init__.py`                         | |0|     | 0         | 100%     |
-| `server/api/__init__.py`                     | 0     | 0         | 100%     |
-| `server/api/crud/__init__.py`                | 0     | 0         | 100%     |
-| `server/api/crud/crud_likes.py`              | 17    | 0         | 100%     |
-| `server/api/crud/crud_medias.py`             | 16    | 0         | 100%     |
-| `server/api/crud/crud_tweets.py`             | 39    | 3         | 92%      |
-| `server/api/crud/crud_users.py`              | 30    | 0         | 100%     |
-| `server/api/routes/__init__.py`              | 8     | 0         | 100%     |
-| `server/api/routes/routes_medias.py`         | 13    | 1         | 92%      |
-| `server/api/routes/routes_tweets.py`         | 28    | 4         | 86%      |
-| `server/api/routes/routes_users.py`          | 24    | 3         | 88%      |
-| `server/core/__init__.py`                    | 0     | 0         | 100%     |
-| `server/core/config.py`                      | 47    | 1         | 98%      |
-| `server/core/dependencies/__init__.py`       | 0     | 0         | 100%     |
-| `server/core/dependencies/authenticate.py`   | 10    | 2         | 80%      |
-| `server/core/middlewares/__init__.py`        | 4     | 0         | 100%     |
-| `server/core/middlewares/log_new_request.py` | 7     | 0         | 100%     |
-| `server/core/models/__init__.py`             | 7     | 0         | 100%     |
-| `server/core/models/db_helper.py`            | 12    | 3         | 75%      |
-| `server/core/models/model_base.py`           | 3     | 0         | 100%     |
-| `server/core/models/model_likes.py`          | 17    | 3         | 82%      |
-| `server/core/models/model_medias.py`         | 14    | 2         | 86%      |
-| `server/core/models/model_tweets.py`         | 18    | 4         | 78%      |
-| `server/core/models/model_users.py`          | 19    | 3         | 84%      |
-| `server/core/schemas/__init__.py`            | 0     | 0         | 100%     |
-| `server/core/schemas/schemas_base.py`        | 24    | 0         | 100%     |
-| `server/core/schemas/schemas_likes.py`       | 9     | 1         | 89%      |
-| `server/core/schemas/schemas_medias.py`      | 4     | 0         | 100%     |
-| `server/core/schemas/schemas_tweets.py`      | 23    | 0         | 100%     |
-| `server/core/schemas/schemas_users.py`       | 10    | 0         | 100%     |
-| `server/create_app.py`                       | 23    | 3         | 87%      |
-| `server/error_handlers.py`                   | 18    | 2         | 89%      |
-| `server/main.py`                             | 6     | 1         | 83%      |
-| `server/utils/__init__.py`                   | 0     | 0         | 100%     |
-| `server/utils/create_mock_data.py`           | 18    | 13        | 28%      |
-| `server/utils/media_writer.py`               | 38    | 6         | 84%      |
-| TOTAL              | 506    | 55         | 89%      |
+### Установка Poetry
+1. Загрузите и установите Poetry через терминал:
+    
+   ```bash
+   curl -sSL https://install.python-poetry.org | python3 -
+2. Добавьте Poetry в переменные окружения. Откройте файл .bashrc, в терминале введите:
 
-**Общее покрытие:** 89% (506 строк кода, 55 пропущено)
+   ```bash
+   nano ~/.bashrc
+   ```
+
+   Вставьте в конец файла:
+   
+   ```bash
+   export PATH="$HOME/.local/bin:$PATH"
+   ```
+
+   Сохраните изменения: `Ctr + X` > `Y` > `Enter`
+3. Обновите настройки терминала:
+
+   ```bash
+   source ~/.bashrc
+   ```
+
+
+### Установка и настройка проекта
+1. Склонируйте репозиторий:
+   
+   ```
+   git clone https://gitlab.skillbox.ru/artiom_kadikov/python_advanced_diploma.git
+2. Создайте и настройте `.env` файл по аналогии с `.example.env`. Ниже приведен примёр переменных, которые можно изменить:
+
+   ```env
+   DB_USER=test
+   DB_PASS=test
+   DB_NAME=test
+### Установка зависимостей и активация виртуального окружения
+1. Установите зависимости. Откройте проект через IDE Pycharm и в терминале введите:
+
+   ```bash
+   poetry install --only dev
+
+2. Добавьте новый интерпретатор в Pycharm. В правом нижнем углу IDE нажмите `Add New Interpreter` > `Add Local Interpreter`, задайте следующие настройки:
+   - **Environment**: Generate new
+   - **Type**: Poetry
+   - **Base python**: Python 3.12.*
+   - **Path to poetry**: /home/user/.local/bin/poetry
+4. Для получения команды, активирующей виртуальное окружение, введите:
+   ```bash
+   poetry env activate
+5. Введите в терминале то, что он выдал из предыдущего пункта, **пример**:
+   ```bash
+   source /home/user/.cache/pypoetry/virtualenvs/twitter-social-network-7uC99hQJ-py3.12/bin/activate
+   ```
+
+После всех установок и настроек перейдите к тестированию приложения - об этом написано далее.  
+Для деактивации виртуального окружения введите `deactivate`.
+
+---
+
+### Использование pre-commit (линтеров)
+- Для проверки кода линтерами используйте команду:
+
+  ```bash
+  pre-commit run --all-files
+  ```
+
+### Использование pytest
+- Для тестирования приожения используйте команду:
+  
+  ```bash
+  pytest -v ./tests
+  ```
+- Для вывод отчёта о покрытии приложения тестами введите:
+  
+   ```bash
+   pytest --cov=./server
+   ```
+**Таблица с отчётом о покрытии тестами**  
+**Общее покрытие:** 87% (530 строк кода, 67 пропущено)
+
+| Файл                                          | Строк | Пропущено | Покрытие |
+|-----------------------------------------------|:-----:|:----:|:-----:|
+| `server/__init__.py`                          |   0   |  0   | 100%  |
+| `server/api/__init__.py`                      |   0   |  0   | 100%  |
+| `server/api/crud/__init__.py`                 |   0   |  0   | 100%  |
+| `server/api/crud/crud_likes.py`               |  17   |  0   | 100%  |
+| `server/api/crud/crud_medias.py`              |  16   |  0   | 100%  |
+| `server/api/crud/crud_tweets.py`              |  44   |  5   | 89%   |
+| `server/api/crud/crud_users.py`               |  30   |  0   | 100%  |
+| `server/api/routes/__init__.py`               |   8   |  0   | 100%  |
+| `server/api/routes/routes_medias.py`          |  13   |  1   | 92%   |
+| `server/api/routes/routes_tweets.py`          |  31   |  5   | 84%   |
+| `server/api/routes/routes_users.py`           |  25   |  4   | 84%   |
+| `server/core/__init__.py`                     |   0   |  0   | 100%  |
+| `server/core/config.py`                       |  47   |  1   | 98%   |
+| `server/core/dependencies/__init__.py`        |   0   |  0   | 100%  |
+| `server/core/dependencies/authenticate.py`    |  10   |  2   | 80%   |
+| `server/core/middlewares/__init__.py`         |   4   |  0   | 100%  |
+| `server/core/middlewares/log_new_request.py`  |   7   |  0   | 100%  |
+| `server/core/models/__init__.py`              |   7   |  0   | 100%  |
+| `server/core/models/db_helper.py`             |  12   |  3   | 75%   |
+| `server/core/models/model_base.py`            |   3   |  0   | 100%  |
+| `server/core/models/model_likes.py`           |  17   |  3   | 82%   |
+| `server/core/models/model_medias.py`          |  14   |  2   | 86%   |
+| `server/core/models/model_tweets.py`          |  18   |  4   | 78%   |
+| `server/core/models/model_users.py`           |  19   |  3   | 84%   |
+| `server/core/schemas/__init__.py`             |   0   |  0   | 100%  |
+| `server/core/schemas/schemas_base.py`         |  24   |  0   | 100%  |
+| `server/core/schemas/schemas_likes.py`        |   9   |  1   | 89%   |
+| `server/core/schemas/schemas_medias.py`       |   4   |  0   | 100%  |
+| `server/core/schemas/schemas_tweets.py`       |  23   |  0   | 100%  |
+| `server/core/schemas/schemas_users.py`        |  10   |  0   | 100%  |
+| `server/create_app.py`                        |  23   |  3   | 87%   |
+| `server/error_handlers.py`                    |  18   |  2   | 89%   |
+| `server/main.py`                              |   6   |  1   | 83%   |
+| `server/utils/__init__.py`                    |   0   |  0   | 100%  |
+| `server/utils/create_mock_data.py`            |  26   |  21  | 19%   |
+| `server/utils/hashed_api_key.py`              |   7   |  0   | 100%  |
+| `server/utils/media_writer.py`                |  38   |  6   | 84%   |
+| **TOTAL**                                     | 530   |  67  | 87%   |
+
+
