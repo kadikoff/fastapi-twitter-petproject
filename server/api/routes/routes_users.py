@@ -31,6 +31,7 @@ router = APIRouter()
 )
 async def get_me(
     current_user: Annotated[Users, Depends(authenticate_user)],
+    session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """Получить информацию о себе (о текущем пользователе)
 
@@ -39,7 +40,11 @@ async def get_me(
     2. Запись api_key текущего пользователя в заголовок ответа
     """
 
-    return {"user": current_user}
+    user: Users | None = await crud_users.get_user_by_id(
+        user_id=current_user.id, session=session
+    )
+
+    return {"user": user}
 
 
 @router.get(

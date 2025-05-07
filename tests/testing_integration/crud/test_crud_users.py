@@ -5,6 +5,7 @@ from sqlalchemy import Result, select
 from server.api.crud import crud_users
 from server.core.models import Users
 from server.core.models import followers_association_table as fat
+from server.utils.hashed_api_key import validate_api_key
 from tests.data.data_db_mock import users_correct
 
 
@@ -21,7 +22,9 @@ async def test_get_user_by_api_key_success(db_session):
     assert user is not None
     assert isinstance(user, Users)
     assert user.name == user_data["name"]
-    assert user.api_key == user_data["api_key"]
+    assert validate_api_key(
+        api_key=user_data["api_key"], hashed_api_key=user.api_key
+    )
 
 
 @pytest.mark.asyncio
@@ -54,7 +57,9 @@ async def test_get_user_by_id_success(db_session):
     assert user is not None
     assert isinstance(user, Users)
     assert user.name == user_data["name"]
-    assert user.api_key == user_data["api_key"]
+    assert validate_api_key(
+        api_key=user_data["api_key"], hashed_api_key=user.api_key
+    )
 
 
 @pytest.mark.asyncio

@@ -3,7 +3,7 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Path, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from server.api.crud import crud_likes, crud_tweets
+from server.api.crud import crud_likes, crud_tweets, crud_users
 from server.core.dependencies.authenticate import authenticate_user
 from server.core.models import Tweets, Users, db_helper
 from server.core.schemas.schemas_base import (
@@ -85,9 +85,13 @@ async def get_tweets(
     default_offset = 0
     default_limit = 50
 
+    user: Users = await crud_users.get_user_by_id(
+        user_id=current_user.id, session=session
+    )
+
     tweets: list[Tweets | None] = await crud_tweets.get_tweets(
         session=session,
-        current_user=current_user,
+        current_user=user,
         offset=offset or default_offset,
         limit=limit or default_limit,
     )

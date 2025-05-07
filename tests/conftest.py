@@ -14,6 +14,7 @@ from server.core.models import (
     db_helper,
 )
 from server.main import app
+from server.utils.hashed_api_key import hash_api_key
 from tests.data.data_db_mock import (
     MEDIAS_DIR,
     medias_correct,
@@ -96,7 +97,14 @@ async def create_mock_data(global_db_session):
     Применяется автоматически только один раз
     за всю сессию тестов при их запуске.
     """
-    await global_db_session.execute(insert(Users), users_correct)
+    for user_correct in users_correct:
+        idx = user_correct["id"]
+        name = user_correct["name"]
+        api_key = user_correct["api_key"]
+
+        user = Users(id=idx, name=name, api_key=hash_api_key(api_key))
+        global_db_session.add(user)
+
     await global_db_session.execute(insert(Tweets), tweets_correct)
     await global_db_session.execute(insert(Medias), medias_correct)
     await global_db_session.commit()
