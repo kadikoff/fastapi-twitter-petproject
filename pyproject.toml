@@ -24,6 +24,7 @@ alembic = "^1.15.2"
 python-multipart = "^0.0.20"
 aiofiles = "^24.1.0"
 orjson = "^3.10.18"
+bcrypt = "^4.3.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -43,6 +44,7 @@ aiosqlite = "^0.21.0"
 httpx = "^0.28.1"
 orjson = "^3.10.18"
 pytest-cov = "^6.1.1"
+bcrypt = "^4.3.0"
 
 [tool.isort]
 profile = "black"
