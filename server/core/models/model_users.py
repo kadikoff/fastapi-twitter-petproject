@@ -26,7 +26,7 @@ class Users(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(30))
-    api_key: Mapped[str] = mapped_column(String(10), unique=True)
+    api_key: Mapped[str] = mapped_column(String(60), unique=True)
 
     tweets: Mapped[list["Tweets"]] = relationship(
         "Tweets", back_populates="user", cascade="all, delete-orphan"
