@@ -22,6 +22,6 @@ async def authenticate_user(
         session=session, api_key=api_key
     )
 
-    response.headers["api-key"] = current_user.api_key
+    response.headers["api-key"] = api_key
 
     return current_user
