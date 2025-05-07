@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from server.core.models import Users, followers_association_table
+from server.utils.hashed_api_key import validate_api_key
 
 
 async def get_user_by_api_key(session: AsyncSession, api_key: str) -> Users:
@@ -23,27 +24,20 @@ async def get_user_by_api_key(session: AsyncSession, api_key: str) -> Users:
     Далее данные о текущем пользователе используются и в других методах.
     """
 
-    stmt = (
-        select(Users)
-        .where(Users.api_key == api_key)
-        .options(
-            joinedload(Users.followers),
-            joinedload(Users.following),
-        )
+    users: Result = await session.execute(select(Users))
+
+    for user in users.scalars().all():
+
+        if validate_api_key(api_key=api_key, hashed_api_key=user.api_key):
+            return user
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="API Key Authentication failed!",
     )
-    db_response: Result = await session.execute(stmt)
-
-    user: Users | None = db_response.unique().scalar_one_or_none()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="API Key Authentication failed!",
-        )
-
-    return user
 
 
-async def get_user_by_id(session: AsyncSession, user_id: int) -> Users | None:
+async def get_user_by_id(session: AsyncSession, user_id: int) -> Users:
     """Получение данных о пользователе по его user_id из таблицы Users
 
     Если пользователь по текущему id не найден - возникает ошибка.
