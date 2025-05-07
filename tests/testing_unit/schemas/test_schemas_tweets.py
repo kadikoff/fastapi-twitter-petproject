@@ -88,8 +88,14 @@ async def test_tweets_read_success(db_session):
     )
     assert user is not None
 
+    offset = 0
+    limit = 50
+
     tweets: list[Tweets | None] = await crud_tweets.get_tweets(
-        session=db_session, current_user=user
+        session=db_session,
+        current_user=user,
+        offset=offset,
+        limit=limit,
     )
     assert tweets is not None
 

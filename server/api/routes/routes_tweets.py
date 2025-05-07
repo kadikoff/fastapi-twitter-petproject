@@ -1,6 +1,6 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, Path, status
+from fastapi import APIRouter, Depends, Path, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.api.crud import crud_likes, crud_tweets
@@ -66,6 +66,12 @@ async def create_tweet(
 )
 async def get_tweets(
     current_user: Annotated[Users, Depends(authenticate_user)],
+    offset: Annotated[
+        Optional[int], Query(ge=1, description="Номер страницы (смещение)")
+    ] = None,
+    limit: Annotated[
+        Optional[int], Query(ge=1, description="Количество твитов на странице")
+    ] = None,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     """Получить информации о всех твитах
@@ -76,8 +82,14 @@ async def get_tweets(
     4. Запрос данных из бд
     """
 
+    default_offset = 0
+    default_limit = 50
+
     tweets: list[Tweets | None] = await crud_tweets.get_tweets(
-        session=session, current_user=current_user
+        session=session,
+        current_user=current_user,
+        offset=offset or default_offset,
+        limit=limit or default_limit,
     )
 
     return {"tweets": tweets}

@@ -73,10 +73,15 @@ async def test_create_tweet_no_data_error(db_session):
 async def test_get_tweets_success(db_session):
     """Тест успешного получения твитов"""
 
+    offset = 0
+    limit = 50
     user_data = Users(**users_correct[0])
 
     new_tweet: list[Tweets | None] = await crud_tweets.get_tweets(
-        session=db_session, current_user=user_data
+        session=db_session,
+        current_user=user_data,
+        offset=offset,
+        limit=limit,
     )
 
     assert new_tweet
