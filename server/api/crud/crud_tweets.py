@@ -42,12 +42,16 @@ async def create_tweet(
 
 
 async def get_tweets(
-    session: AsyncSession, current_user: Users
+    session: AsyncSession,
+    current_user: Users,
+    offset: int,
+    limit: int,
 ) -> list[Tweets | None]:
     """Получение списка всех твитов из таблицы Tweets
 
-    При запросе пользователь получит ленту твитов от тех
-    пользователей, на которых он подписан.
+    При запросе пользователь получит ленту твитов
+    отсортированных в порядке убывания по популярности
+    от пользователей, на которых он подписан
 
     Используется в эндпоинте:
     - GET /api/tweets - получить информации о всех твитах
@@ -56,8 +60,33 @@ async def get_tweets(
     following_ids: list[int] = [user.id for user in current_user.following]
     following_ids.append(current_user.id)
 
+    # Логика пагинации:
+    #
+    # Если пользователь включил пагинацию на сайте,
+    # то есть передал Query-параметры offset и limit:
+    # - start - начало диапазона выборки = (номер_стр - 1) * размер_стр
+    # - stop - конец диапазона выборки = (номер_стр * размер_стр)
+    #
+    # Пример для offset=2, limit=10:
+    # - start = (2 - 1) * 10 = 10 (получим элементы массива с индекса 10)
+    # - stop = 2 * 10 = 20 (по индекс 20)
+    #
+    # В данном случае start и stop это индексы элементов из массива
+    # с выдачей твитов, пример (аналогия): tweets_massive[start:stop]
+    if offset != 0:
+        start = (offset - 1) * limit
+        stop = offset * limit
+
+    # Если пагинация не используется (Query-параметры offset и limit
+    # не переданы), то по умолчанию в эту функцию передаются
+    # offset=0 и limit=50, то есть из бд получим
+    # первые 50 твитов (start=0, stop=50)
+    else:
+        start = offset
+        stop = limit
+
     stmt = (
-        select(Tweets, func.count(Tweets.likes).label("count_likes"))
+        select(Tweets)
         .filter(Tweets.user_id.in_(following_ids))
         .options(
             joinedload(Tweets.user),
@@ -66,7 +95,8 @@ async def get_tweets(
         )
         .outerjoin(Tweets.likes)
         .group_by(Tweets)
-        .order_by(desc("count_likes"))
+        .order_by(desc(func.count(Tweets.likes)), Tweets.tweet_id)
+        .slice(start, stop)
     )
 
     db_response: Result = await session.execute(stmt)
