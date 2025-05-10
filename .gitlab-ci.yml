@@ -1,3 +1,5 @@
+# Для Gitghub, соответственно, не актуально, но пусть останется, как пример для Gitlab.
+
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
