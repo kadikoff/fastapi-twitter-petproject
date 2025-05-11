@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from server.api.routes import router
 from server.core.config import settings
@@ -43,5 +44,6 @@ def create_app() -> FastAPI:
     app.include_router(router=router)
     register_errors_handlers(app)
     register_middlewares(app)
+    Instrumentator().instrument(app).expose(app)
 
     return app
