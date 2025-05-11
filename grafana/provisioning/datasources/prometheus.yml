@@ -1,0 +1,22 @@
+# Настройки prometheus для сбора данных в Grafana UI
+
+apiVersion: 1  # Версия схемы конфигурации Grafana API (всегда 1 для текущих версий)
+
+datasources:
+- name: "Prometheus"  # Имя источника (отображается в UI)
+  type: "prometheus" # Тип источника (соответствует плагину)
+  access: "proxy"  # Режим доступа:
+                    # - 'proxy' = Grafana будет проксировать запросы
+                    # - 'direct' = клиентские запросы напрямую к Prometheus
+  url: "http://prometheus:9090"  # Базовый URL Prometheus:
+                                 # - 'prometheus' = имя сервиса в Docker-сети
+                                 # - 9090 = стандартный порт Prometheus
+  isDefault: true  # Источник данных по умолчанию
+
+  jsonData:  # Дополнительные параметры в формате JSON
+    httpMethod: "GET"  # Метод HTTP-запросов:
+    exemplarTraceIdDestinations:  # Настройки для связки с системой трейсинга
+      - name: "traceID" # Название поля с traceID в exemplars
+        datasourceUid: "tempo" # UID источника данных для трейсов (например, Tempo)
+
+  version: 1  # Версия конфигурации источника (фиксированное значение)
