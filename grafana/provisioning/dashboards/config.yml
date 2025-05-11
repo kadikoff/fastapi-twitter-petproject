@@ -1,0 +1,16 @@
+# Настройка импортов дашбордов для Grafana UI
+
+apiVersion: 1  # Версия схемы конфигурации Grafana API (всегда 1 для текущих версий)
+
+providers:
+- name: 'default'  # Уникальное имя провайдера (Prometheus'а) (используется для идентификации)
+  orgId: 1  # ID организации в Grafana (1 - основная организация)
+  folder: ''  # Папка для дашбордов внутри Grafana UI (корневая папка)
+  type: file  # Тип провайдера (file - загрузка из файловой системы)
+
+  # Параметры управления дашбордами
+  disableDeletion: true  # Запрет удаления дашбордов через UI (true - read only)
+  updateIntervalSeconds: 10  # Интервал проверки обновлений (в секундах)
+
+  options:
+    path: /etc/grafana/provisioning/dashboards  # Путь внутри контейнера, где искать JSON-дашборды
