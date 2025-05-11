@@ -24,7 +24,7 @@ services:
         condition: service_healthy
         restart: true
     ports:
-      - '8000:8000'
+      - "8000:8000"
     volumes:
       - ./server/medias:/project/server/medias
     networks:
@@ -49,7 +49,7 @@ services:
       -c logging_collector=on
       -c log_directory=/var/lib/postgresql/logs
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - ./db/:/var/lib/postgresql/data:delegated
     networks:
