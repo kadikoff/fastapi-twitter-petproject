@@ -55,6 +55,32 @@ services:
     networks:
       - mynetwork
 
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - mynetwork
+
+  grafana:
+    image:  grafana/grafana-oss:10.2.2
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASS}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning  # Prometheus и дашборд будет уже настроен (конфиги внутри)
+      - ./grafana:/var/lib/grafana
+    user: "root"
+    networks:
+      - mynetwork
 
 networks:
   mynetwork:
