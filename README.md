@@ -235,7 +235,7 @@ Api-key пользователей хранятся в виде bcrypt-хеше�
 1. Склонируйте репозиторий:
    
    ```
-   git clone https://gitlab.skillbox.ru/artiom_kadikov/python_advanced_diploma.git
+   git clone https://github.com/kadikoff/fastapi-twitter-petproject.git
 2. Создайте и настройте `.env` файл по аналогии с `.example.env`. Ниже приведен примёр переменных, которые можно изменить:
 
    ```env
